@@ -1,7 +1,7 @@
 <?php
+	// Shitty code, yes, I know...
     if(isset($_GET['node'], $_GET['interface'])){
         $command = escapeshellcmd('python3 int-desc.py ' . $_GET['node'] . ' ' . $_GET['interface']);
-        # var_dump($command);
         $output = trim(shell_exec($command));
         exit(json_encode(array('status' => 'ok', 'desc' => $output)));
     }
@@ -17,7 +17,9 @@
 
         <script>
             $(document).ready(function(){
-                /* Fix interface description on "l2ng-l2-mac-logical-interface" */
+                /*
+					Fix interface description on "l2ng-l2-mac-logical-interface" and "active-interface"
+				*/
                 $('.filter-on-logical-interface').each(function(index){
                     var elem = $(this);
                     $.getJSON('?', {node: $(this).attr('data-node'), interface: $(this).text()})
@@ -61,7 +63,6 @@
 				
 				/*
 					Calculate the number of elements for each filter
-					9
 				*/
 				$('.show-only-config-vlan')
 					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-conf-vlans').length + '</span>');
@@ -82,13 +83,17 @@
             Jumbotron
         -->
         <div class="bg-light rounded-3 border my-4">
-            <div class="container-fluid px-5 py-2 my-5">
-                <h1 class="display-5 fw-bold mt-0">evpn-grep v0.1</h1>
-                <p class="fs-4">Find (hourly cached) info from the IPfabric leaf switches regarding ethernet-switching and evpn database.</p>
+            <div class="container-fluid px-5 my-5">
+                <h1 class="display-5 fw-bold mt-0">evpn-grep v0.2</h1>
+                <p class="fs-4">Find (hourly cached) info from the Juniper IP-fabric infrastructure.</p>
                 <p>If you expect to see more info than shown, wait a minute and try again. Data is purged from the database before it's inserted (bulk action).</p>
                 <p>Sources: <kbd>show arp no-resolve</kbd>, <kbd>show ethernet-switching table</kbd, <kbd>show evpn database</kbd>, <kbd>show conf vlans</kbd> and <kbd>show conf routing-instance VS-EVPN-DC bridge-domains</kbd> on all "*.ipfab.*.leaf*" and "*.core.*" nodes.</p>
                 <p>Search examples: "<a href="?q=2996">2996</a>", "<a href="?q=63:3b:e8">63:3b:e8</a>" or "<a href="?q=10.248.252.143">10.248.252.143</a>"</p>
-                <p class="mb-0">System documentation/code: <a href="https://www.vegvesen.no/wiki/display/Drift/svvpautomate01+-+evpn-grep">wiki</a>
+                <?php
+					if(file_exists('customer_intro.text')){
+						require('customer_intro.text');
+					}
+				?>
             </div>
         </div>
         
@@ -96,7 +101,7 @@
             Form + display results
         -->
         <div class="bg-light rounded-3 border my-4">
-            <div class="container-fluid px-5 py-2 my-5">
+            <div class="container-fluid px-5 my-5">
 				<h1>Search</h1>
                 <form class="row g-3" method="get" action="">
                     <div class="col-auto">
@@ -201,10 +206,12 @@
                     $string = preg_replace(
                         array(
                             '/vni-id: ([0-9]*)/',
-                            '/mac-address: (.*)/'
+                            '/mac-address: (.*)/',
+							'/active-source: ([a-z]{2}-.+)/'
                         ), array(
                             'vni-id: <a href="?q=$1">$1</a>',
-                            'mac-address: <a href="?q=$1">$1</a>'
+                            'mac-address: <a href="?q=$1">$1</a>',
+							'active-source: <span data-node="' . $node . '" class="filter-on-logical-interface bg-danger text-white">$1</span>'
                         ),
                     $string);
                 }

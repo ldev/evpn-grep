@@ -8,9 +8,13 @@ Uses:
 * Python3
 * PHP
 * SQlite
+* Python JSON
+
+##
+Please be aware that this is low quality code, no security what so ever has been implemented. This is more a "proof of concept" than anything that should be put into production.
 
 ## Screenshot(s)
-![Screenshot from evpn-grep](documentation/screenshot-evpn-grep.png?raw=true)
+![Screenshot from evpn-grep](documentation/screenshot-evpn-grep-2.png?raw=true)
 
 ## crontab
 sqlite vacuum is used to free up space. Not ideal...

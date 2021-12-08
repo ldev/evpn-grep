@@ -1,13 +1,13 @@
-# 
-# Oppgave: Hente ut info fra "show evpn database" og "show ethernet-switching table", lagre (enten til fil eller DB) og vise det.
-#
+#!/usr/bin/env python3
 
-from jnpr.junos import Device
 import json
 import sys
 import datetime
 import os
 import sqlite3
+import json
+
+from jnpr.junos import Device
 from pprint import pprint
 from lxml import etree
 
@@ -39,32 +39,22 @@ except Exception as e:
 # Gets the netconf credentials from an external file.
 #
 try:
-        import json
-        with open('/data/netconf-credentials.json') as f:
-                netconf_credentials = json.load(f, encoding='utf-8')
+    with open('/data/netconf-credentials.json') as f:
+        netconf_credentials = json.load(f, encoding='utf-8')
 except:
-        print('ERROR: could not load netconf credentials')
-        sys.exit(1)
+    print('ERROR: could not load netconf credentials')
+    sys.exit(1)
 
+#
+# Load hosts from hosts.json
+#
+try:
+    with open('hosts.json') as f:
+        hosts_json = json.load(f, encoding='utf-8')
+        hosts = hosts_json['hosts'])
+except:
+    print('ERROR: could not load "hosts.json"')
 
-hosts = [
-    '00a-core-1',
-    '00a-core-2',
-    '00b-core-1',
-    '00b-core-2',
-    '00a-ipfab-d4-leaf-01',
-    '00a-ipfab-d4-leaf-02',
-    '00a-ipfab-d4-leaf-03',
-    '00a-ipfab-d4-leaf-04',
-    '00a-ipfab-d3-leaf-01',
-    '00a-ipfab-d3-leaf-02',
-    '00b-ipfab-d5-leaf-01',
-    '00b-ipfab-d5-leaf-02',
-    '00b-ipfab-d5-leaf-03',
-    '00b-ipfab-d5-leaf-04',
-    '00a-ipfab-d4-leaf-05',
-    '00a-ipfab-d4-leaf-06'
-]
 
 #
 # Fetch data over netconf, store in DB
@@ -119,9 +109,7 @@ for host in hosts:
                 for tag in entry.iter():
                     if not len(tag): # checks if tags contains other tags
                         blob.append('%s: %s' % (tag.tag, tag.text))
-                blargh = '\n'.join(blob)
-                
-                db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ethernet switching table', blargh))
+                db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ethernet switching table', '\n'.join(blob)))
                 counter += 1
             
             #
@@ -132,9 +120,7 @@ for host in hosts:
                 for tag in entry.iter():
                     if not len(tag): # checks if tags contains other tags
                         blob.append('%s: %s' % (tag.tag, tag.text))
-                blargh = '\n'.join(blob)
-                
-                db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ethernet switching table', blargh))
+                db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ethernet switching table', '\n'.join(blob)))
                 counter += 1
 
         #
@@ -147,9 +133,7 @@ for host in hosts:
             for tag in entry.iter():
                 if not len(tag): # checks if tags contains other tags
                     blob.append('%s: %s' % (tag.tag, tag.text))
-            blargh = '\n'.join(blob)
-            
-            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ARP table', blargh))
+            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'ARP table', '\n'.join(blob)))
             counter += 1
 
         #
@@ -162,8 +146,7 @@ for host in hosts:
             for tag in conf_vlan.iter():
                 if not len(tag): # checks if tags contains other tags
                     blob.append('conf-vlans-%s: %s' % (tag.tag, tag.text))
-            blargh = '\n'.join(blob)
-            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'conf-vlans', blargh))
+            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'conf-vlans', '\n'.join(blob)))
             counter += 1
 
         #
@@ -176,8 +159,7 @@ for host in hosts:
             for tag in conf_bd.iter():
                 if not len(tag): # checks if tags contains other tags
                     blob.append('conf-bd-%s: %s' % (tag.tag, tag.text))
-            blargh = '\n'.join(blob)
-            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'conf-bd', blargh))
+            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'conf-bd', '\n'.join(blob)))
             counter += 1
         
         db_con.commit()
