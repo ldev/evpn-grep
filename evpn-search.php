@@ -30,6 +30,49 @@
                         }
                     });
                 });
+				
+				/*
+					FILTERS
+				*/
+				$('.show-only-config-vlan').click(function(){
+					$('#search_result_table tbody tr').hide();
+					$('#search_result_table tbody tr.type-conf-vlans').show();
+				});
+				
+				$('.show-only-evpn-database').click(function(){
+					$('#search_result_table tbody tr').hide();
+					$('#search_result_table tbody tr.type-evpn-database').show();
+				});
+				
+				$('.show-only-ethernet-switching-table').click(function(){
+					$('#search_result_table tbody tr').hide();
+					$('#search_result_table tbody tr.type-ethernet-switching-table').show();
+				});
+				
+				$('.show-only-arp-table').click(function(){
+					$('#search_result_table tbody tr').hide();
+					$('#search_result_table tbody tr.type-arp-table').show();
+				});
+				
+				$('.show-only-config-bd').click(function(){
+					$('#search_result_table tbody tr').hide();
+					$('#search_result_table tbody tr.type-conf-bd').show();
+				});
+				
+				/*
+					Calculate the number of elements for each filter
+					9
+				*/
+				$('.show-only-config-vlan')
+					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-conf-vlans').length + '</span>');
+				$('.show-only-evpn-database')
+					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-evpn-database').length + '</span>');
+				$('.show-only-ethernet-switching-table')
+					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-ethernet-switching-table').length + '</span>');
+				$('.show-only-arp-table')
+					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-arp-table').length + '</span>');
+				$('.show-only-config-bd')
+					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-conf-bd').length + '</span>');
             });
         </script>
 
@@ -54,6 +97,7 @@
         -->
         <div class="bg-light rounded-3 border my-4">
             <div class="container-fluid px-5 py-2 my-5">
+				<h1>Search</h1>
                 <form class="row g-3" method="get" action="">
                     <div class="col-auto">
                         <label for="" class="visually-hidden">Query for...</label>
@@ -67,6 +111,22 @@
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
                 </form>
+				<?php
+					if(isset($_GET['q'])){
+						echo '
+							<div class="row">
+								<div class="col-md-12 pt-4">
+									<h2>Filter</h2>
+									<button type="button" class="show-only-evpn-database btn-sm btn btn-secondary">EVPN database</button>
+									<button type="button" class="show-only-ethernet-switching-table btn-sm btn btn-secondary">ethernet switching table</button>
+									<button type="button" class="show-only-arp-table btn-sm btn btn-secondary">ARP table</button>
+									<button type="button" class="show-only-config-vlan btn-sm btn btn-secondary">vlan-config</button>
+									<button type="button" class="show-only-config-bd btn-sm btn btn-secondary">bridge-domain config</button>
+								</div>
+							</div>
+						';
+					}
+				?>
             </div>
         </div>
         
@@ -165,7 +225,7 @@
                 }else{
                     echo '
                     
-                    <table class="table">
+                    <table class="table" id="search_result_table">
                         <thead>
                             <tr>
                                 <th scope="col">Node</th>
@@ -181,7 +241,7 @@
                     $results = $db->query('select * from data where content like "%' . SQLite3::escapeString($q) . '%";');
                     while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
                         echo '
-                            <tr>
+                            <tr class="type-' . strtolower(str_replace(' ', '-', $row['type'])) . '">
                                 <th scope="row"><span style="white-space: nowrap;">' . $row['node'] . '</span></th>
                                 <td>' . $row['date'] . '</td>
                                 <td>' . $row['type'] . '</td>
