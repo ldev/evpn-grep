@@ -176,9 +176,9 @@ for host in hosts:
                 for tag in entry.iter():
                     if not len(tag): # checks if tags contains other tags
                         blob.append('%s: %s' % (tag.tag, tag.text))
-            pprint(blob)
-            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'EVPN ARP table', '\n'.join(blob)))
-            counter += 1
+                pprint(blob)
+                db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'EVPN ARP table', '\n'.join(blob)))
+                counter += 1
 
         except RpcError as e:
             print('Warning: %s does not support get_ethernet_switching_evpn_arp_table(). Skipping check.' % host)

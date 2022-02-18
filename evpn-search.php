@@ -157,20 +157,22 @@
                     Make stuff clickable and hilight "physical" logical interfaces
                     split into two sections, for optimization. Less lines to regex match against
                 */
-                if(strpos($string, 'l2ng-l2') !== false || strpos($string, 'l2-mac-') !== false){ # ethernet switching
+                if(strpos($string, 'l2ng-l2') !== false || strpos($string, 'l2-mac-') !== false){ # "ethernet switching" and "ethernet-switching arp-table"
                     $string = preg_replace(
                         array(
                             '/^l2ng-l2-mac-logical-interface: ([a-z]{2}[\-0-9].*)/m',
                             '/^l2ng-l2-mac-vlan-name: (.*)/m',
                             '/^l2ng-l2-mac-address: (.*)/m',
                             '/^l2-mac-address: (.*)/m',
-                            '/^l2-bridge-vlan: (.*)/m'
+                            '/^l2-bridge-vlan: (.*)/m',
+                            '/^l2ng-l2-evpn-arp-inet-address: (.*)/m'
                         ), array(
                             'l2ng-l2-mac-logical-interface: <span data-node="' . $node . '" class="filter-on-logical-interface bg-danger text-white">$1</span>',
                             'l2ng-l2-mac-vlan-name: <a href="?q=$1">$1</a>',
                             'l2ng-l2-mac-address: <a href="?q=$1">$1</a>',
                             'l2-mac-address: <a href="?q=$1">$1</a>',
-                            'l2-bridge-vlan: <a href="?q=$1">$1</a>'
+                            'l2-bridge-vlan: <a href="?q=$1">$1</a>',
+                            'l2ng-l2-evpn-arp-inet-address: <a href="?q=$1">$1</a>'
                         ),
                     $string);
                 }elseif(strpos($string, 'interface-name') !== false){ # ARP
