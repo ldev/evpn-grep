@@ -55,11 +55,20 @@
 					$('#search_result_table tbody tr').hide();
 					$('#search_result_table tbody tr.type-arp-table').show();
 				});
+
+                $('.show-only-evpn-arp-table').click(function(){
+                    $('#search_result_table tbody tr').hide();
+                    $('#search_result_table tbody tr.type-evpn-arp-table').show();
+                });
 				
 				$('.show-only-config-bd').click(function(){
 					$('#search_result_table tbody tr').hide();
 					$('#search_result_table tbody tr.type-conf-bd').show();
 				});
+
+                $('.show-all').click(function(){
+                    $('#search_result_table tbody tr').show();
+                });
 				
 				/*
 					Calculate the number of elements for each filter
@@ -72,6 +81,8 @@
 					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-ethernet-switching-table').length + '</span>');
 				$('.show-only-arp-table')
 					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-arp-table').length + '</span>');
+                $('.show-only-evpn-arp-table')
+                    .append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-evpn-arp-table').length + '</span>');
 				$('.show-only-config-bd')
 					.append('<span class="badge rounded-pill bg-light text-dark ms-2">' + $('#search_result_table tbody tr.type-conf-bd').length + '</span>');
             });
@@ -125,8 +136,10 @@
 									<button type="button" class="show-only-evpn-database btn-sm btn btn-secondary">EVPN database</button>
 									<button type="button" class="show-only-ethernet-switching-table btn-sm btn btn-secondary">ethernet switching table</button>
 									<button type="button" class="show-only-arp-table btn-sm btn btn-secondary">ARP table</button>
+                                    <button type="button" class="show-only-evpn-arp-table btn-sm btn btn-secondary">EVPN ARP table</button>
 									<button type="button" class="show-only-config-vlan btn-sm btn btn-secondary">vlan-config</button>
 									<button type="button" class="show-only-config-bd btn-sm btn btn-secondary">bridge-domain config</button>
+                                    <button type="button" class="show-all btn-sm btn btn-secondary">Show all</button>
 								</div>
 							</div>
 						';

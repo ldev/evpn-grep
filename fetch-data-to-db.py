@@ -11,6 +11,8 @@ from jnpr.junos import Device
 from pprint import pprint
 from lxml import etree
 
+from jnpr.junos.exception import ConnectTimeoutError, ConnectUnknownHostError, RpcError
+
 #
 # Figure out the directory of this file
 # NB: No trailing slash
@@ -51,9 +53,10 @@ except:
 try:
     with open('hosts.json') as f:
         hosts_json = json.load(f, encoding='utf-8')
-        hosts = hosts_json['hosts'])
+        hosts = hosts_json['hosts']
 except:
     print('ERROR: could not load "hosts.json"')
+    sys.exit(1)
 
 
 #
@@ -161,10 +164,29 @@ for host in hosts:
                     blob.append('conf-bd-%s: %s' % (tag.tag, tag.text))
             db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'conf-bd', '\n'.join(blob)))
             counter += 1
-        
+
+        #
+        # Get data from "show ethernet-switching evpn arp-table"
+        # Warning: unsupported on MX, that's why we will have to wrap this especially in try/catch
+        #
+        try:
+            evpn_arp = dev.rpc.get_ethernet_switching_evpn_arp_table()
+            for entry in evpn_arp.findall('l2ng-l2rtb-evpn-arp-entry'):
+                blob = []
+                for tag in entry.iter():
+                    if not len(tag): # checks if tags contains other tags
+                        blob.append('%s: %s' % (tag.tag, tag.text))
+            pprint(blob)
+            db_cur.execute("INSERT INTO data VALUES ('%s','%s', '%s', '%s')" % (datetime.datetime.now(), host, 'EVPN ARP table', '\n'.join(blob)))
+            counter += 1
+
+        except RpcError as e:
+            print('Warning: %s does not support get_ethernet_switching_evpn_arp_table(). Skipping check.' % host)
+            pass
+
+
         db_con.commit()
         print('%s: inserted %s rows into SQlite3 DB' % (host, counter))
-
     except Exception as e:
         print(e)
         print(sys.exc_info()[0])
